@@ -45,10 +45,15 @@ public class ShowBoardCommand implements Command {
                 Position pos = new Position(x, y);
                 Tile tile = tiles.get(pos);
                 String[] lines = formatTile(tile);
-                row1.append(lines[0]);
-                row2.append(lines[1]);
-                row3.append(lines[2]);
+
+                row1.append("|").append(lines[0]);
+                row2.append("|").append(lines[1]);
+                row3.append("|").append(lines[2]);
             }
+
+            row1.append("|");
+            row2.append("|");
+            row3.append("|");
 
             System.out.println(row1);
             System.out.println(row2);
@@ -60,28 +65,29 @@ public class ShowBoardCommand implements Command {
         String[] result = new String[3];
 
         if (tile == null) {
-            result[0] = "      ";
-            result[1] = "      ";
-            result[2] = "      ";
+            result[0] = "     ";
+            result[1] = "     ";
+            result[2] = "     ";
         } else if (tile instanceof BarnTile) {
-            String abbr = padRight(tile.getAbbreviation(), 2);
+            String abbr = padRight(tile.getAbbreviation(), 3);
             String cd = tile.getCountdown() >= 0 ? String.valueOf(tile.getCountdown()) : "*";
-            result[0] = "      ";
-            result[1] = String.format("| %s %s |", abbr.trim(), cd);  // Trim to remove extra space
-            result[2] = "      ";
+            result[0] = "     ";
+            result[1] = String.format("%-3s %s", abbr, cd);
+            result[2] = "     ";
         } else {
-            String abbr = padRight(tile.getAbbreviation(), 2);
-            String cd = tile.getCountdown() >= 0 ? String.valueOf(tile.getCountdown()) : " *";
-            result[0] = String.format("| %s%s |", abbr.trim(), cd);
+            String abbr = padRight(tile.getAbbreviation(), 3);
+            String cd = tile.getCountdown() >= 0 ? String.valueOf(tile.getCountdown()) : "*";
+            result[0] = String.format("%-3s %s", abbr, cd);
 
             if (tile.getPlantedType() != null) {
                 String type = tile.getPlantedType().toString().toUpperCase().substring(0, 1);
-                result[1] = String.format("|  %s  |", type);
+                result[1] = "  " + type + "  ";
             } else {
-                result[1] = "|     |";
+                result[1] = "     ";
             }
 
-            result[2] = String.format("|%d/%d |", tile.getAmount(), tile.getCapacity());
+            String cap = tile.getAmount() + "/" + tile.getCapacity();
+            result[2] = String.format("%-5s", cap);
         }
 
         return result;
@@ -89,5 +95,4 @@ public class ShowBoardCommand implements Command {
 
     private String padRight(String s, int length) {
         return String.format("%-" + length + "s", s);
-    }
-}
+    }}
