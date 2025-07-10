@@ -11,7 +11,7 @@ public class CommandParser {
 
     public CommandParser() {
         commands.put("show", new ShowCommand()); // Basiskommandogruppe
-        // Weitere Befehle folgen hier, z. B.:
+        commands.put("show market", new ShowMarketCommand());
         // commands.put("sell", new SellCommand());
         // commands.put("plant", new PlantCommand());
     }
@@ -29,13 +29,10 @@ public class CommandParser {
             }
 
             return switch (parts[1]) {
-                case "barn" -> new ShowCommand().execute(parts, player, game);
-                case "board" -> new ShowBoardCommand().execute(parts, player, game);
-                case "market" -> {
-                    System.out.println("Error, show market not implemented");
-                    yield false;
-                }
-                default -> {
+                case "barn"   -> new ShowCommand().execute(parts, player, game);
+                case "board"  -> new ShowBoardCommand().execute(parts, player, game);
+                case "market" -> new ShowMarketCommand().execute(parts, player, game);
+                default       -> {
                     System.out.println("Error, invalid show target");
                     yield false;
                 }

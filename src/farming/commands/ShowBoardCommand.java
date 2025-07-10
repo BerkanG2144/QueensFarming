@@ -5,6 +5,7 @@ import farming.game.Player;
 import farming.model.BarnTile;
 import farming.model.Position;
 import farming.model.Tile;
+import farming.model.VegetableType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ public class ShowBoardCommand implements Command {
     public boolean execute(String[] args, Player player, Game game) {
         if (args.length == 2 && args[1].equals("board")) {
             showBoard(player);
-            return false; // zählt nicht als Aktion
+            return false;
         }
 
         System.out.println("Error, invalid show command");
@@ -43,58 +44,95 @@ public class ShowBoardCommand implements Command {
 
             for (int x = xmin; x <= xmax; x++) {
                 Position pos = new Position(x, y);
-                Tile tile = tiles.get(pos);
-                String[] lines = formatTile(tile);
+                Tile   tile = tiles.get(pos);
+                String[] lines = formatTile(tile); // 3×5-Zeichen
 
-                if (x > xmin) {
-                    row1.append("|");
-                    row2.append("|");
-                    row3.append("|");
+                if (tile == null) {
+                    // leere Zelle: immer genau 6 Leerzeichen
+                    row1.append("      ");
+                    row2.append("      ");
+                    row3.append("      ");
+                } else {
+                    // linke Pipe + Inhalt
+                    row1.append("|").append(lines[0]);
+                    row2.append("|").append(lines[1]);
+                    row3.append("|").append(lines[2]);
+
+                    // wenn rechts KEINE weitere Tile ist, jetzt mit Pipe schließen
+                    Position rightNeighbour = new Position(x + 1, y);
+                    if (!tiles.containsKey(rightNeighbour)) {
+                        row1.append("|");
+                        row2.append("|");
+                        row3.append("|");
+                    }
                 }
-
-                row1.append(lines[0]);
-                row2.append(lines[1]);
-                row3.append(lines[2]);
             }
 
             System.out.println(row1);
             System.out.println(row2);
             System.out.println(row3);
         }
+
     }
 
     private String[] formatTile(Tile tile) {
-        String[] result = new String[3];
-
         if (tile == null) {
-            result[0] = "     ";
-            result[1] = "     ";
-            result[2] = "     ";
-        } else if (tile instanceof BarnTile) {
-            String abbr = padRight(tile.getAbbreviation(), 3);
-            String cd = tile.getCountdown() >= 0 ? String.valueOf(tile.getCountdown()) : "*";
-            result[0] = "     ";
-            result[1] = String.format("%-3s %s", abbr, cd);
-            result[2] = "     ";
-        } else {
-            String abbr = padRight(tile.getAbbreviation(), 3);
-            String cd = tile.getCountdown() >= 0 ? String.valueOf(tile.getCountdown()) : "*";
-            result[0] = String.format("%-3s %s", abbr, cd);
-
-            if (tile.getPlantedType() != null) {
-                String type = tile.getPlantedType().toString().toUpperCase().substring(0, 1);
-                result[1] = "  " + type + "  ";
-            } else {
-                result[1] = "     ";
-            }
-
-            String cap = tile.getAmount() + "/" + tile.getCapacity();
-            result[2] = String.format("%-5s", cap);
+            return new String[]{"     ", "     ", "     "};
         }
 
-        return result;
+        String abbr = tile.getAbbreviation();
+        String cd = tile.getCountdown() >= 0 ? String.valueOf(tile.getCountdown()) : "*";
+
+        if (tile instanceof BarnTile) {
+            return formatBarnTile(abbr, cd);
+        } else {
+            String veg = tile.getPlantedType() != null ? getVegetableChar(tile.getPlantedType()) : " ";
+            String cap = tile.getAmount() + "/" + tile.getCapacity();
+            return formatRegularTile(abbr, cd, veg, cap);
+        }
     }
 
-    private String padRight(String s, int length) {
-        return String.format("%-" + length + "s", s);
-    }}
+    private String[] formatBarnTile(String abbr, String countdown) {
+        String line2 = centerString(abbr + " " + countdown, 5);
+        return new String[]{
+                "     ",
+                line2,
+                "     "
+        };
+    }
+
+    private String[] formatRegularTile(String abbr, String countdown, String veg, String cap) {
+        return new String[]{
+                centerString(abbr + " " + countdown, 5),
+                centerString(veg, 5),
+                centerString(cap, 5)
+        };
+    }
+
+    private String centerString(String s, int width) {
+        if (s.length() >= width) {
+            return s.substring(0, width);
+        }
+
+        int padding = (width - s.length()) / 2;
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < padding; i++) {
+            result.append(" ");
+        }
+        result.append(s);
+        while (result.length() < width) {
+            result.append(" ");
+        }
+        return result.toString();
+    }
+
+    private String getVegetableChar(VegetableType type) {
+        return switch (type) {
+            case CARROT -> "C";
+            case SALAD -> "S";
+            case TOMATO -> "T";
+            case MUSHROOM -> "M";
+            default -> " ";
+        };
+    }
+}

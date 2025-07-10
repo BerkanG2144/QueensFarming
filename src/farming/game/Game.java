@@ -24,6 +24,12 @@ public class Game {
         this.gameOver = false;
     }
 
+
+    public void showMarket() {
+        market.showMarket();
+    }
+
+
     public void initializeGame() {
         System.out.println("How many players?");
         int numPlayers = 0;
@@ -111,7 +117,6 @@ public class Game {
             actionsThisTurn = 0;
 
             while (actionsThisTurn < 2) {
-                System.out.print("> ");
                 String input = scanner.nextLine().trim();
 
                 if (input.equalsIgnoreCase("quit")) {
