@@ -10,7 +10,9 @@ public class CommandParser {
     private final Map<String, Command> commands = new HashMap<>();
 
     public CommandParser() {
-        commands.put("show", new ShowCommand()); // Basiskommandogruppe
+        // register all commands here
+        commands.put("show barn", new ShowCommand());
+        commands.put("show board", new ShowBoardCommand());
         commands.put("show market", new ShowMarketCommand());
         // commands.put("sell", new SellCommand());
         // commands.put("plant", new PlantCommand());
@@ -27,16 +29,13 @@ public class CommandParser {
                 System.out.println("Error, missing show target");
                 return false;
             }
-
-            return switch (parts[1]) {
-                case "barn"   -> new ShowCommand().execute(parts, player, game);
-                case "board"  -> new ShowBoardCommand().execute(parts, player, game);
-                case "market" -> new ShowMarketCommand().execute(parts, player, game);
-                default       -> {
-                    System.out.println("Error, invalid show target");
-                    yield false;
-                }
-            };
+            String key2 = keyword + " " + parts[1].toLowerCase();
+            Command command = commands.get(key2);
+            if (command == null) {
+                System.out.println("Error, invalid show target");
+                return false;
+            }
+            return command.execute(parts, player, game);
         }
 
         Command command = commands.get(keyword);
