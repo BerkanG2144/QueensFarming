@@ -1,14 +1,17 @@
 package farming.commands;
 
-import farming.game.GameContext;
+import farming.game.Player;
+import farming.view.GameView;
 
 import java.util.Optional;
 
 public class CommandParser {
-    private final GameContext context;
+    private final Player player;
+    private final GameView view;
 
-    public CommandParser(GameContext context) {
-        this.context = context;
+    public CommandParser(Player player, GameView view) {
+        this.player = player;
+        this.view = view;
     }
 
     public boolean handle(String input) {
@@ -30,7 +33,7 @@ public class CommandParser {
         switch (keyword) {
             case "show":
                 if (parts.length == 2 && parts[1].equalsIgnoreCase("barn")) {
-                    return Optional.of(new ShowBarnCommand(context));
+                    return Optional.of(new ShowBarnCommand(player, view));
                 }
                 // Weitere show-Befehle hier ergänzen
                 System.err.println("Error, unknown show command");
