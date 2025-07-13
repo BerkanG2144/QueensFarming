@@ -2,6 +2,8 @@ package farming.game;
 
 import farming.commands.CommandParser;
 import farming.model.*;
+import farming.view.ConsoleGameView;
+import farming.view.GameView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,6 @@ public class Game {
     public void showMarket() {
         market.showMarket();
     }
-
 
     public void initializeGame() {
         System.out.println("How many players?");
@@ -110,11 +111,13 @@ public class Game {
     }
 
     public void run() {
-        CommandParser parser = new CommandParser();
+        GameView view = new ConsoleGameView();
 
         while (!gameOver) {
             Player currentPlayer = players.get(currentPlayerIndex);
             actionsThisTurn = 0;
+
+            CommandParser parser = new CommandParser(currentPlayer, view, this);
 
             while (actionsThisTurn < 2) {
                 String input = scanner.nextLine().trim();
@@ -128,7 +131,7 @@ public class Game {
                     break;
                 }
 
-                boolean counted = parser.handle(input, currentPlayer, this);
+                boolean counted = parser.handle(input);
                 if (counted) actionsThisTurn++;
             }
 

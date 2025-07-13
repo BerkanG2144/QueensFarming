@@ -1,11 +1,13 @@
 package farming.commands;
 
-import farming.game.Game;
-import farming.game.Player;
-
 public interface Command {
     /**
-     * @return true if it counts as an action, false otherwise
+     * Führt das Kommando aus.
      */
-    boolean execute(String[] args, Player player, Game game);
+    void execute();
+
+    /**
+     * Gibt zurück, ob das Kommando gültig ausgeführt werden kann.
+     */
+    boolean isValid();
 }

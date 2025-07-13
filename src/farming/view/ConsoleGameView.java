@@ -1,21 +1,14 @@
-package farming.commands;
+package farming.view;
 
-import farming.game.Game;
 import farming.game.Player;
 import farming.model.BarnTile;
 import farming.model.VegetableType;
 
 import java.util.*;
 
-public class ShowCommand implements Command{
+public class ConsoleGameView implements GameView{
     @Override
-    public boolean execute(String[] args, Player player, Game game) {
-        if (args.length != 2 || !args[1].equals("barn")) {
-            System.out.println("Error, invalid show command");
-            return false;
-        }
-
-        BarnTile barn = player.getBarn();
+    public void showBarn(BarnTile barn, int gold) {
 
         Map<VegetableType, Integer> stored = new EnumMap<>(VegetableType.class);
         for (VegetableType type : VegetableType.values()) {
@@ -66,10 +59,9 @@ public class ShowCommand implements Command{
             System.out.printf("Sum" + sumPad + ": %" + maxValueDigits + "d\n\n", sum);
         }
 
+        System.out.printf("Gold: %6d\n", gold);
 
-        System.out.printf("Gold: %6d\n", player.getGold());
 
-        return false; // "show" zählt nicht als Aktion
     }
 
     private String getPlural(VegetableType type) {
@@ -80,4 +72,5 @@ public class ShowCommand implements Command{
             case TOMATO -> "tomatoes";
         };
     }
+
 }
