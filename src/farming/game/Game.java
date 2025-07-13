@@ -6,7 +6,6 @@ import farming.view.ConsoleGameView;
 import farming.view.GameView;
 
 // Provides context objects for command execution
-import farming.game.GameContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,8 +119,7 @@ public class Game {
             Player currentPlayer = players.get(currentPlayerIndex);
             actionsThisTurn = 0;
 
-            GameContext context = new GameContext(currentPlayer, market, view);
-            CommandParser parser = new CommandParser(context);
+            CommandParser parser = new CommandParser(currentPlayer, view);
 
             while (actionsThisTurn < 2) {
                 String input = scanner.nextLine().trim();

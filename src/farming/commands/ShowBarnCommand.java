@@ -1,20 +1,19 @@
 package farming.commands;
 
-import farming.game.GameContext;
 import farming.game.Player;
 import farming.view.GameView;
 
 public class ShowBarnCommand implements Command {
-    private final GameContext context;
+    private final Player player;
+    private final GameView view;
 
-    public ShowBarnCommand(GameContext context) {
-        this.context = context;
+    public ShowBarnCommand(Player player, GameView view) {
+        this.player = player;
+        this.view = view;
     }
 
     @Override
     public void execute() {
-        Player player = context.getCurrentPlayer();
-        GameView view = context.getView();
         view.showBarn(player.getBarn(), player.getGold());
     }
 
