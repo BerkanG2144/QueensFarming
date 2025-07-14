@@ -17,7 +17,7 @@ public enum VegetableType {
         return growTime;
     }
 
-    public String getVegetableChar(VegetableType type) {
+    public static String getVegetableChar(VegetableType type) {
         return switch (type) {
             case CARROT -> "C";
             case SALAD -> "S";

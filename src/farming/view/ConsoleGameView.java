@@ -1,10 +1,7 @@
 package farming.view;
 
 import farming.game.Player;
-import farming.model.BarnTile;
-import farming.model.Board;
-import farming.model.Tile;
-import farming.model.VegetableType;
+import farming.model.*;
 
 import java.util.*;
 
@@ -68,39 +65,102 @@ public class ConsoleGameView implements GameView{
 
     @Override
     public void showBoard(Player player) {
-       Board board  = player.getBoard();
-       List<Tile> tiles = (List<Tile>) board.getAllTiles();
-
-        int minX = tiles.stream().mapToInt(t -> t.getPosition().getX()).min().orElse(0);
-        int maxX = tiles.stream().mapToInt(t -> t.getPosition().getX()).max().orElse(0);
-        int minY = tiles.stream().mapToInt(t -> t.getPosition().getY()).min().orElse(0);
-        int maxY = tiles.stream().mapToInt(t -> t.getPosition().getY()).max().orElse(0);
-
-        String[][] display = new String[maxY - minY + 1][maxX - minX + 1];
-        for (String [] row : display) {
-            Arrays.fill(row, " ");
+        List<Tile> tileList = new ArrayList<>(player.getBoard().getAllTiles());
+        Map<Position, Tile> tiles = new HashMap<>();
+        for (Tile tile : tileList) {
+            tiles.put(tile.getPosition(), tile);
         }
 
-        for (Tile tile : tiles) {
-            int x = tile.getPosition().getX() - minX;
-            int y = tile.getPosition().getY() - minY;
-            String symbol;
-            if (tile instanceof BarnTile) {
-                symbol = "B ";
-            } else {
-                VegetableType planted = tile.getPlantedType();
-                symbol = planted != null ? planted.getVegetableChar(planted) + tile.getCountdown() : tile.getPlantedType().getVegetableChar(planted) + " ";
+        int xmin = tiles.keySet().stream().mapToInt(Position::getX).min().orElse(0);
+        int xmax = tiles.keySet().stream().mapToInt(Position::getX).max().orElse(0);
+        int ymin = tiles.keySet().stream().mapToInt(Position::getY).min().orElse(0);
+        int ymax = tiles.keySet().stream().mapToInt(Position::getY).max().orElse(0);
+
+        List<String> output = new ArrayList<>();
+        output.add("Board");
+
+        for (int y = ymax; y >= ymin; y--) {
+            StringBuilder row1 = new StringBuilder();
+            StringBuilder row2 = new StringBuilder();
+            StringBuilder row3 = new StringBuilder();
+
+            for (int x = xmin; x <= xmax; x++) {
+                Position pos = new Position(x, y);
+                Tile tile = tiles.get(pos);
+                String[] lines = formatTile(tile);
+
+                if (tile == null) {
+                    row1.append("      ");
+                    row2.append("      ");
+                    row3.append("      ");
+                } else {
+                    row1.append("|").append(lines[0]);
+                    row2.append("|").append(lines[1]);
+                    row3.append("|").append(lines[2]);
+
+                    Position rightNeighbour = new Position(x + 1, y);
+                    if (!tiles.containsKey(rightNeighbour)) {
+                        row1.append("|");
+                        row2.append("|");
+                        row3.append("|");
+                    }
+                }
             }
-            display[y][x] = symbol;
+
+            output.add(row1.toString());
+            output.add(row2.toString());
+            output.add(row3.toString());
         }
 
-        // Ausgabe der Matrix
-        System.out.println("Board");
-        for (String[] row : display) {
-            System.out.println(String.join(" ", row));
-        }
-        System.out.println();
+        output.add(""); // Leere Zeile am Ende
+    }
 
+    private String[] formatTile(Tile tile) {
+        if (tile == null) {
+            return new String[]{"     ", "     ", "     "};
+        }
+
+        String abbr = tile.getAbbreviation(); // Annahme: getType() gibt TileType zurück
+        String cd = tile.getCountdown() >= 0 ? String.valueOf(tile.getCountdown()) : "*";
+
+        if (tile instanceof BarnTile barnTile) {
+            return formatBarnTile(abbr, cd, barnTile);
+        } else {
+            String veg = tile.getPlantedType() != null ? VegetableType.getVegetableChar(tile.getPlantedType()) : " ";
+            String cap = tile.getAmount() + "/" + tile.getCapacity();
+            return formatRegularTile(abbr, cd, veg, cap);
+        }
+    }
+
+    private String[] formatBarnTile(String abbr, String countdown, BarnTile barnTile) {
+        String content = abbr + " " + countdown;
+        String line2 = centerString(content, 5);
+        return new String[]{"     ", line2, "     "};
+    }
+
+    private String[] formatRegularTile(String abbr, String countdown, String veg, String cap) {
+        return new String[]{
+                centerString(abbr + " " + countdown, 5),
+                centerString(veg, 5),
+                centerString(cap, 5)
+        };
+    }
+
+    private String centerString(String s, int width) {
+        if (s.length() >= width) {
+            return s.substring(0, width);
+        }
+
+        int padding = (width - s.length()) / 2;
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < padding; i++) {
+            result.append(" ");
+        }
+        result.append(s);
+        while (result.length() < width) {
+            result.append(" ");
+        }
+        return result.toString();
     }
 
     private String getPlural(VegetableType type) {
