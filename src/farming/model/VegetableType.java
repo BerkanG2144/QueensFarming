@@ -17,6 +17,16 @@ public enum VegetableType {
         return growTime;
     }
 
+    public String getVegetableChar(VegetableType type) {
+        return switch (type) {
+            case CARROT -> "C";
+            case SALAD -> "S";
+            case TOMATO -> "T";
+            case MUSHROOM -> "M";
+            default -> " ";
+        };
+    }
+
     @Override
     public String toString() {
         return name().toLowerCase();

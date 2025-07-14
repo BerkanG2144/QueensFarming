@@ -68,7 +68,39 @@ public class ConsoleGameView implements GameView{
 
     @Override
     public void showBoard(Player player) {
-        List<Tile> tileList = new ArrayList<>(player.getBoard().getAllTiles());
+       Board board  = player.getBoard();
+       List<Tile> tiles = (List<Tile>) board.getAllTiles();
+
+        int minX = tiles.stream().mapToInt(t -> t.getPosition().getX()).min().orElse(0);
+        int maxX = tiles.stream().mapToInt(t -> t.getPosition().getX()).max().orElse(0);
+        int minY = tiles.stream().mapToInt(t -> t.getPosition().getY()).min().orElse(0);
+        int maxY = tiles.stream().mapToInt(t -> t.getPosition().getY()).max().orElse(0);
+
+        String[][] display = new String[maxY - minY + 1][maxX - minX + 1];
+        for (String [] row : display) {
+            Arrays.fill(row, " ");
+        }
+
+        for (Tile tile : tiles) {
+            int x = tile.getPosition().getX() - minX;
+            int y = tile.getPosition().getY() - minY;
+            String symbol;
+            if (tile instanceof BarnTile) {
+                symbol = "B ";
+            } else {
+                VegetableType planted = tile.getPlantedType();
+                symbol = planted != null ? planted.getVegetableChar(planted) + tile.getCountdown() : tile.getPlantedType().getVegetableChar(planted) + " ";
+            }
+            display[y][x] = symbol;
+        }
+
+        // Ausgabe der Matrix
+        System.out.println("Board");
+        for (String[] row : display) {
+            System.out.println(String.join(" ", row));
+        }
+        System.out.println();
+
     }
 
     private String getPlural(VegetableType type) {

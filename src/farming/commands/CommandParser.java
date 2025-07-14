@@ -32,8 +32,12 @@ public class CommandParser {
 
         switch (keyword) {
             case "show":
-                if (parts.length == 2 && parts[1].equalsIgnoreCase("barn")) {
-                    return Optional.of(new ShowBarnCommand(player, view));
+                if (parts.length == 2) {
+                    if (parts[1].equalsIgnoreCase("barn")) {
+                        return Optional.of(new ShowBarnCommand(player, view));
+                    } else if (parts[1].equalsIgnoreCase("board")) {
+                        return Optional.of(new ShowBoardCommand(player, view));
+                    }
                 }
                 // Weitere show-Befehle hier ergänzen
                 System.err.println("Error, unknown show command");

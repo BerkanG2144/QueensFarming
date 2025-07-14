@@ -15,11 +15,11 @@ public class ShowBoardCommand implements Command{
 
     @Override
     public void execute() {
-        view.showBoard(player.getBoard());
+        view.showBoard(player);
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        return player != null && view != null && !player.getBoard().getAllTiles().isEmpty();
     }
 }
