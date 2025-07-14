@@ -2,6 +2,8 @@ package farming.view;
 
 import farming.game.Player;
 import farming.model.BarnTile;
+import farming.model.Board;
+import farming.model.Tile;
 import farming.model.VegetableType;
 
 import java.util.*;
@@ -62,6 +64,11 @@ public class ConsoleGameView implements GameView{
         System.out.printf("Gold: %6d\n", gold);
 
 
+    }
+
+    @Override
+    public void showBoard(Player player) {
+        List<Tile> tileList = new ArrayList<>(player.getBoard().getAllTiles());
     }
 
     private String getPlural(VegetableType type) {

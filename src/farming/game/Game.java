@@ -119,6 +119,7 @@ public class Game {
             Player currentPlayer = players.get(currentPlayerIndex);
             actionsThisTurn = 0;
 
+
             CommandParser parser = new CommandParser(currentPlayer, view);
 
             while (actionsThisTurn < 2) {
