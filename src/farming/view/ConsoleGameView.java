@@ -2,9 +2,9 @@ package farming.view;
 
 import farming.game.Player;
 import farming.model.BarnTile;
-import farming.model.Board;
 import farming.model.Tile;
 import farming.model.VegetableType;
+import farming.model.Position;
 
 import java.util.*;
 
@@ -69,6 +69,24 @@ public class ConsoleGameView implements GameView{
     @Override
     public void showBoard(Player player) {
         List<Tile> tileList = new ArrayList<>(player.getBoard().getAllTiles());
+
+        // Sort tiles first by y then by x for a stable output
+        tileList.sort(Comparator
+                .comparing((Tile t) -> t.getPosition().getY())
+                .thenComparing(t -> t.getPosition().getX()));
+
+        for (Tile tile : tileList) {
+            Position pos = tile.getPosition();
+            String info = tile.getAbbreviation() + " at " + pos;
+            VegetableType planted = tile.getPlantedType();
+            if (planted != null) {
+                info += " - " + planted.toString().toLowerCase() + ": " + tile.getAmount();
+                if (tile.getCountdown() > 0) {
+                    info += " (" + tile.getCountdown() + ")";
+                }
+            }
+            System.out.println(info);
+        }
     }
 
     private String getPlural(VegetableType type) {
